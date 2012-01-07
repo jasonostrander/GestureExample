@@ -7,7 +7,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -52,7 +51,7 @@ public class NewTouchExample extends View {
         
         for (Pointer p : mPointers) {
             if (p.id != -1) {
-                String text = "Index: " + p.index + "\n" + "id: " + p.id;
+                String text = "Index: " + p.index + " ID: " + p.id;
                 canvas.drawText(text, p.x, p.y, textPaint);
             }
         }
@@ -63,19 +62,27 @@ public class NewTouchExample extends View {
         mGestureDetector.onTouchEvent(event);
         mScaleGestureDetector.onTouchEvent(event);
         
-        // clear previous pointers
-        for (int i = 0; i<mPointers.size(); i++)
-            mPointers.get(i).id = -1;
-        
-        // Now fill in the new
-        for (int i = 0; i<event.getPointerCount(); i++) {
-            Pointer pointer = mPointers.get(i);
-            pointer.index = i;
-            pointer.id = event.getPointerId(i);
-            pointer.x = event.getX(i);
-            pointer.y = event.getY(i);
+        switch (event.getAction() & MotionEvent.ACTION_MASK) {
+        case MotionEvent.ACTION_DOWN:
+        case MotionEvent.ACTION_POINTER_DOWN:
+        case MotionEvent.ACTION_MOVE:
+            // clear previous pointers
+            for (int i = 0; i<mPointers.size(); i++)
+                mPointers.get(i).id = -1;
+
+            // Now fill in the current pointers
+            for (int i = 0; i<event.getPointerCount(); i++) {
+                Pointer pointer = mPointers.get(i);
+                pointer.index = i;
+                pointer.id = event.getPointerId(i);
+                pointer.x = event.getX(i);
+                pointer.y = event.getY(i);
+            }
+            invalidate();
+            break;
+        case MotionEvent.ACTION_POINTER_UP:
+        case MotionEvent.ACTION_CANCEL:
         }
-        invalidate();
         return true;
     }
     
