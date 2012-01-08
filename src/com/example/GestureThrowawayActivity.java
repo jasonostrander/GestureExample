@@ -25,11 +25,10 @@ public class GestureThrowawayActivity extends Activity  {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+//        FirstPassExample view = new FirstPassExample(this);
         NewTouchExample view = new NewTouchExample(this);
 //        TouchExample view = new TouchExample(this);
 //        TouchIdExample view = new TouchIdExample(this);
-        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
 
         setContentView(view);
         

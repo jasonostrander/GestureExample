@@ -19,7 +19,7 @@ public class NewTouchExample extends View {
     private ScaleGestureDetector mScaleGestureDetector;
 
     private List<Pointer> mPointers;
-    private Paint textPaint;
+    private Paint mPaint;
     private float mFontSize;
     
     class Pointer {
@@ -37,8 +37,8 @@ public class NewTouchExample extends View {
         }
         
         mFontSize = 16 * getResources().getDisplayMetrics().density;
-        textPaint = new Paint();
-        textPaint.setColor(Color.WHITE);
+        mPaint = new Paint();
+        mPaint.setColor(Color.WHITE);
 
         mGestureDetector = new GestureDetector(context, new ZoomGesture());
         mScaleGestureDetector = new ScaleGestureDetector(context, new ScaleGesture());
@@ -47,12 +47,12 @@ public class NewTouchExample extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        textPaint.setTextSize(mScale*mFontSize);
+        mPaint.setTextSize(mScale*mFontSize);
         
         for (Pointer p : mPointers) {
             if (p.id != -1) {
                 String text = "Index: " + p.index + " ID: " + p.id;
-                canvas.drawText(text, p.x, p.y, textPaint);
+                canvas.drawText(text, p.x, p.y, mPaint);
             }
         }
     }
@@ -80,7 +80,6 @@ public class NewTouchExample extends View {
             }
             invalidate();
             break;
-        case MotionEvent.ACTION_POINTER_UP:
         case MotionEvent.ACTION_CANCEL:
         }
         return true;
