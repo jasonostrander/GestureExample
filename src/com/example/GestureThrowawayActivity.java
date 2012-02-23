@@ -25,8 +25,10 @@ public class GestureThrowawayActivity extends Activity  {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+//        NewTouchExample_JBL view = new NewTouchExample_JBL(this);
+      NewTouchExample view = new NewTouchExample(this);
+        
 //        FirstPassExample view = new FirstPassExample(this);
-        NewTouchExample view = new NewTouchExample(this);
 //        TouchExample view = new TouchExample(this);
 //        TouchIdExample view = new TouchIdExample(this);
 

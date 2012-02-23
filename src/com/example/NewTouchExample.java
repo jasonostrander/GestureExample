@@ -14,11 +14,12 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 
 public class NewTouchExample extends View {
+    private static final int MAX_POINTERS = 5;
     private float mScale = 1f;
     private GestureDetector mGestureDetector;
     private ScaleGestureDetector mScaleGestureDetector;
 
-    private List<Pointer> mPointers;
+    private Pointer[] mPointers = new Pointer[MAX_POINTERS];
     private Paint mPaint;
     private float mFontSize;
     
@@ -31,14 +32,14 @@ public class NewTouchExample extends View {
     
     public NewTouchExample(Context context) {
         super(context);
-        mPointers = new ArrayList<Pointer>();
-        for (int i = 0; i<5; i++) {
-            mPointers.add(new Pointer());
+        for (int i = 0; i<MAX_POINTERS; i++) {
+            mPointers[i] = new Pointer();
         }
         
         mFontSize = 16 * getResources().getDisplayMetrics().density;
         mPaint = new Paint();
         mPaint.setColor(Color.WHITE);
+        mPaint.setTextSize(mFontSize);
 
         mGestureDetector = new GestureDetector(context, new ZoomGesture());
         mScaleGestureDetector = new ScaleGestureDetector(context, new ScaleGesture());
@@ -47,10 +48,8 @@ public class NewTouchExample extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        mPaint.setTextSize(mScale*mFontSize);
-        
         for (Pointer p : mPointers) {
-            if (p.id != -1) {
+            if (p.index != -1) {
                 String text = "Index: " + p.index + " ID: " + p.id;
                 canvas.drawText(text, p.x, p.y, mPaint);
             }
@@ -62,25 +61,33 @@ public class NewTouchExample extends View {
         mGestureDetector.onTouchEvent(event);
         mScaleGestureDetector.onTouchEvent(event);
         
+        int pointerCount = Math.min(event.getPointerCount(), MAX_POINTERS);
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
         case MotionEvent.ACTION_DOWN:
         case MotionEvent.ACTION_POINTER_DOWN:
         case MotionEvent.ACTION_MOVE:
             // clear previous pointers
-            for (int i = 0; i<mPointers.size(); i++)
-                mPointers.get(i).id = -1;
+            for (int id = 0; id<MAX_POINTERS; id++)
+                mPointers[id].index = -1;
 
             // Now fill in the current pointers
-            for (int i = 0; i<event.getPointerCount(); i++) {
-                Pointer pointer = mPointers.get(i);
+            for (int i = 0; i<pointerCount; i++) {
+                int id = event.getPointerId(i);
+                Pointer pointer = mPointers[id];
                 pointer.index = i;
-                pointer.id = event.getPointerId(i);
+                pointer.id = id;
                 pointer.x = event.getX(i);
                 pointer.y = event.getY(i);
             }
             invalidate();
             break;
         case MotionEvent.ACTION_CANCEL:
+            for (int i = 0; i<pointerCount; i++) {
+                int id = event.getPointerId(i);
+                mPointers[id].index = -1;
+            }
+            invalidate();
+            break;
         }
         return true;
     }
@@ -90,11 +97,8 @@ public class NewTouchExample extends View {
         
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-            if (normal) {
-                mScale = 3f;
-            } else {
-                mScale = 1f;
-            }
+            mScale = normal ? 3f : 1f;
+            mPaint.setTextSize(mScale*mFontSize);
             normal = !normal;
             invalidate();
             return true;
@@ -105,6 +109,7 @@ public class NewTouchExample extends View {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
             mScale *= detector.getScaleFactor();
+            mPaint.setTextSize(mScale*mFontSize);
             invalidate();
             return true;
         }
